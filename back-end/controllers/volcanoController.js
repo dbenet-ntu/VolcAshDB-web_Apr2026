@@ -1,5 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const { Volcano } = require('../models/volcano');
+const { Particle } = require('../models/particle');
 
 /**
  * Retrieves all volcano records from the database.
@@ -11,42 +12,115 @@ const get = async (req, res) => {
         // Fetch all volcano records
         const volcanoes = await Volcano.find();
         
-        res.status(200).json({ success: true, volcanoes });
+        res.status(200).send(volcanoes);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(500).send(error.message);
     }
 };
 
 /**
- * Retrieves volcano records that have associated AFE records.
+ * Retrieves Volcano documents based on a tectonic setting.
+ * @param {Object} req - The request object containing the tectonic setting query.
+ * @param {Object} res - The response object.
+ */
+const getTectonicSetting = async (req, res) => {
+    // Extract the volcano name from the query parameters
+    const tectonic_setting = req.query.tectonic_setting === "Undefined" ? null : req.query.tectonic_setting;
+    const natural_sample = req.query.natural_sample === 'true';
+
+    try {
+        // Aggregate volcano documents that match the given tectonic setting
+        const volcanoes = await Volcano.aggregate([
+            {
+                $lookup: {
+                    from: "samples",  // Collection to join with
+                    localField: "volc_num",  // Field from the volcano collection
+                    foreignField: "volc_num", // Field from the afes collection
+                    as: "sample_details"  // Alias for the joined records
+                }
+            },
+            {
+                $match: {
+                    sample_details: { 
+                        $exists: true,  // Ensure the field exists
+                        $ne: []  // Ensure the field is not an empty array
+                    }
+                }
+            },
+            {
+                $match: {
+                    tectonic_settings: tectonic_setting, // Filter based on the tectonic setting
+                    "sample_details.sample_nat": natural_sample  // Ensure at least one sample has sample_nat = natural_sample
+                }
+            }
+        ]);
+        res.status(200).send(volcanoes);
+    } catch (error) {
+        res.status(404).send(error.message);
+    }
+};
+
+/**
+ * Retrieves volcano records that have associated samples records and the number of particles associated.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object used to send the response.
  */
 const getVolcStd = async (req, res) => {
     try {
-        // Aggregate volcano records with associated AFE records
-        const volcanoes = await Volcano.aggregate([
+
+        const volcanoes = await Particle.aggregate([
             {
-                $lookup: {
-                    from: "afes",  // Collection to join with
-                    localField: "volc_num",  // Field from the volcano collection
-                    foreignField: "volc_num", // Field from the afes collection
-                    as: "afe_code"  // Alias for the joined records
+                $match: {
+                    faulty_image: { $ne: true } // Exclude particles with faulty images
                 }
             },
             {
-                $match: {
-                    afe_code: { 
-                        $exists: true,  // Ensure the field exists
-                        $ne: []  // Ensure the field is not an empty array
-                    }
+                $group: {
+                    _id: "$volc_num", // Change this to the relevant filter field
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "volcanoes",  // Collection to join with
+                    localField: "_id",  // Field from the volcano collection
+                    foreignField: "volc_num", // Field from the afes collection
+                    as: "volcano_details"  // Alias for the joined records
+                }
+            },
+            {
+                $unwind: {
+                    path: '$volcano_details',
+                    preserveNullAndEmptyArrays: true // Keep particles even if they have no AFE details
+                }
+            },
+            {
+                $lookup: {
+                    from: "samples",  // Collection to join with
+                    localField: "_id",  // Field from the volcano collection
+                    foreignField: "volc_num", // Field from the afes collection
+                    as: "sample_details"  // Alias for the joined records
+                }
+            },
+            {
+                $unwind: {
+                    path: '$sample_details',
+                    preserveNullAndEmptyArrays: true // Keep particles even if they have no AFE details
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id",  // Regroup by the volcano number
+                    count: { $first: "$count" },  // Preserve the original count
+                    volcano_details: { $first: "$volcano_details" },  // Keep the volcano details
+                    samples: { $push: "$sample_details" }  // Aggregate all sample details into an array
                 }
             }
         ]);
 
-        res.status(200).json({ success: true, volcanoes });
+        res.status(200).send(volcanoes);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -63,9 +137,9 @@ const add = async (req, res) => {
         // Save the new volcano to the database
         await newVolcano.save();
         
-        res.status(200).json({ success: true, message: 'Volcano added successfully' });
+        res.status(200).send('Volcano added successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -86,9 +160,9 @@ const update = async (req, res) => {
         // Find and update the volcano record
         await Volcano.findOneAndUpdate(filter, update, options);
         
-        res.status(200).json({ success: true, message: 'Volcano updated successfully' });
+        res.status(200).send('Volcano updated successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -102,16 +176,16 @@ const remove = async (req, res) => {
 
     // Validate the ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ success: false, error: 'No such volcano' });
+        return res.status(404).send('No such volcano');
     }
 
     try {
         // Find and delete the volcano record by ID
         await Volcano.findByIdAndDelete(id);
         
-        res.status(200).json({ success: true, message: 'Volcano deleted successfully' });
+        res.status(200).send('Volcano deleted successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -127,14 +201,15 @@ const getVolcNum = async (req, res) => {
         // Find volcano records by number
         const volcano = await Volcano.find({ 'volc_num': volc_num });
         
-        res.status(200).json({ success: true, volcano });
+        res.status(200).send(volcano);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
 module.exports = {
     get, 
+    getTectonicSetting,
     getVolcStd,
     getVolcNum,
     add,

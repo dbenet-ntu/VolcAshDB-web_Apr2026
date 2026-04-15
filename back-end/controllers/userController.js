@@ -15,14 +15,14 @@ const loginUser = async (req, res) => {
         // Generate a JWT token
         const token = await User.createToken(user._id, user.role);
 
-        res.status(200).json({
+        res.status(200).send({
             email,
             token,
             country: user.country,
             institute: user.institute
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).send(error.message);
     }
 };
 
@@ -41,14 +41,15 @@ const signupUser = async (req, res) => {
         // Generate a JWT token
         const token = await User.createToken(user._id, user.role);
 
-        res.status(200).json({
+        res.status(200).send({
             email,
             token,
             country: user.country,
-            institute: user.institute
+            institute: user.institute,
+            status: user.status
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).send(error.message);
     }
 };
 
@@ -62,15 +63,11 @@ const verifyUser = async (req, res) => {
         const { email, code } = req.body;
 
         // Verify the provided code
-        const user = await User.verifyCode(email, code);
+        await User.verifyCode(email, code);
 
-        res.status(200).json({
-            email,
-            country: user.country,
-            institute: user.institute
-        });
+        res.sendStatus(200);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).send(error.message);
     }
 };
 
@@ -86,9 +83,9 @@ const update = async (req, res) => {
         // Find and update user by email
         await User.findOneAndUpdate({ email }, updateFields);
 
-        res.status(200).json({ success: true, message: 'User updated successfully' });
+        res.status(200).send('User updated successfully');
     } catch (error) {
-        res.status(404).json({ success: false, message: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -102,9 +99,9 @@ const getRoles = async (req, res) => {
         // Fetch users' emails and roles
         const users = await User.find({}, { email: 1, role: 1, _id: 0 });
 
-        res.status(200).json(users);
+        res.status(200).send(users);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch users email and roles' });
+        res.status(500).send(error.message);
     }
 };
 
@@ -120,9 +117,9 @@ const forgetPassword = async (req, res) => {
         // Process password reset request
         await User.forgetPassword(email);
 
-        res.status(200).json({ success: true, message: 'Email sent' });
+        res.status(200).send('Email sent');
     } catch (error) {
-        res.status(500).send({ success: false, message: error.message });
+        res.status(500).send(error.message);
     }
 };
 
@@ -134,22 +131,22 @@ const forgetPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const userId = req.user; // Extract user ID from request
-        const { password, confirmpassword } = req.body;
+        const { password, confirmPassword } = req.body;
 
         // Reset the user's password
-        const user = await User.resetPassword(userId, password, confirmpassword);
+        const user = await User.resetPassword(userId, password, confirmPassword);
 
         // Generate a JWT token
         const token = await User.createToken(user._id, user.role);
 
-        res.status(200).json({
+        res.status(200).send({
             email: user.email,
             token,
             country: user.country,
             institute: user.institute
         });
     } catch (error) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send(error.message);
     }
 };
 

@@ -9,10 +9,56 @@ const { AFE } = require('../models/afe');
  */
 const get = async (req, res) => {
     try {
+        const { displayNaturalData } = req.body;
+
+        const display_natural = displayNaturalData === true;
+
         const particles = await Particle.aggregate([
             {
                 $match: {
                     faulty_image: { $ne: true } // Exclude particles with faulty images
+                }
+            },
+            {
+                $lookup: {
+                    from: 'samples',
+                    localField: 'sample_code',
+                    foreignField: 'sample_code',
+                    as: 'sample_details'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$sample_details',
+                    preserveNullAndEmptyArrays: true // Keep particles even if they have no AFE details
+                }
+            },
+            {
+                $addFields: {
+                    sample_code: '$sample_details.sample_code',
+                    sample_date: '$sample_details.sample_date',
+                    sample_nat: '$sample_details.sample_nat',
+                    afe_code: '$sample_details.afe_code',
+                    sample_lat: '$sample_details.sample_lat',
+                    sample_lon: '$sample_details.sample_lon',
+                    temperature_lower_bound: '$sample_details.temperature_lower_bound',
+                    temperature_upper_bound: '$sample_details.temperature_upper_bound',
+                    oxygen_fugacity: '$sample_details.oxygen_fugacity',
+                    experiment_duration: '$sample_details.experiment_duration',
+                    sample_techn: '$sample_details.sample_techn',
+                    sample_surf: '$sample_details.sample_surf',
+                    sample_collector: '$sample_details.sample_collector',
+                    lab_procedure: '$sample_details.lab_procedure',
+                }
+            },
+            {
+                $project: {
+                    sample_details: 0 // Exclude the original 'afe_details' field from the result
+                }
+            },
+            {
+                $match: {
+                    sample_nat: display_natural // Exclude the original 'afe_details' field from the result
                 }
             },
             {
@@ -31,15 +77,12 @@ const get = async (req, res) => {
             },
             {
                 $addFields: {
+                    afe_code: '$afe_details.afe_code',
                     eruptive_style: '$afe_details.eruptive_style',
                     afe_date: '$afe_details.afe_date',
                     afe_dateBP: '$afe_details.afe_dateBP',
                     afe_lat: '$afe_details.afe_lat',
                     afe_lon: '$afe_details.afe_lon',
-                    temperature_lower_bound: '$afe_details.temperature_lower_bound',
-                    temperature_upper_bound: '$afe_details.temperature_upper_bound',
-                    oxygen_fugacity: '$afe_details.oxygen_fugacity',
-                    experiment_duration: '$afe_details.experiment_duration'
                 }
             },
             {
@@ -63,6 +106,7 @@ const get = async (req, res) => {
             },
             {
                 $addFields: {
+                    tectonic_settings: '$volc_details.tectonic_settings',
                     volc_lat: '$volc_details.volc_slat',
                     volc_lon: '$volc_details.volc_slon'
                 }
@@ -74,9 +118,9 @@ const get = async (req, res) => {
             }
         ]);
 
-        res.status(200).json({ success: true, particles });
+        res.status(200).send(particles);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -91,7 +135,7 @@ const getTags = async (req, res) => {
 
         // Define fields of interest for tags
         const fields = [
-            'volcanoName', 'eruptions', 'eruptiveStyle', 'grainSize', 
+            'tectonicSetting', 'volcanoName', 'eruptions', 'eruptiveStyle', 'grainSize', 
             'mainType', 'shape', 'crystallinity', 'color', 
             'hydroAlterDegree', 'juvenileType', 'lithicType', 
             'alteredMaterialType', 'freeCrystalType'
@@ -105,6 +149,7 @@ const getTags = async (req, res) => {
 
         // Process particles collection
         const particleFields = {
+            tectonicSetting: 'tectonic_settings',
             volcanoName: 'volcano_name',
             eruptiveStyle: 'eruptive_style',
             grainSize: 'grain_size',
@@ -157,9 +202,9 @@ const getTags = async (req, res) => {
             }
         }
 
-        res.status(200).json({ success: true, tags });
+        res.status(200).send(tags);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).send(error.message);
     }
 };
 
@@ -175,24 +220,60 @@ const getExamples = async (req, res) => {
                 $match: {
                     imgURL: {
                         $in: [
-                            "PI-DB1_01_2_21_mf_5x_phi0phi1_AMF.png",
-                            "ME-DB1_01_1_5_mf_5x_phi0phi1_LLtrmcn.png",
-                            "TO-DB1_01_1_46_mf_5x_phi0phi1_PG.png",
-                            "SG-DB1_3_03_48_mf_5x_phi0phi1_AW.png",
-                            "ON-DB1_01_1_3_mf_5x_phi0phi1_AHh.png",
-                            "NC-DB2_01_1_82_mf_5x_phi0phi1_AHm.png",
-                            "MS-DB1_01_1_2_mf_5x_phi0phi1_JJtrlcp.png",
-                            "KE-DB2_01_2_4_mf_5x_phi1phi2_JJtrlcp.png",
-                            "CV-DB1_01_1_2_mf_5x_phi0phi1_JJtrlcf.png"
+                            "CIN-11-DB15_1_01_1_153_mf_5x_phi1phi2_JJbllchv.png",
+                            "CIN-11-DB15_1_01_1_111_mf_5x_phi1phi2_AHh.png",
+                            "ST-00-EXP_1_1_1_2_VHX_200_unsieved.png",
+                            "ET-15-EXP_1_2_1_49_VHX_200_unsieved.png",
+                            "ONT-10-DB1_1_03_1_27_mf_4x_phi0phi1_AHh.png",
+                            "CIN-11-DB2_1_01_2_5_mf_5x_phi0phi1_LLtrmcn.png",
+                            "CIN-11-DB2_1_01_2_104_mf_5x_phi0phi1_PG.png",
+                            "CIN-11-DB2_1_01_2_57_mf_5x_phi0phi1_PX.png",
+                            "MEA-22post-DB2_1_01_2_90_mf_5x_phi0phi1_AHh.png",
                         ]
                     }
+                },
+            },
+            {
+                $lookup: {
+                    from: 'samples', // Lookup AFE details from the 'afes' collection
+                    localField: 'sample_code',
+                    foreignField: 'sample_code',
+                    as: 'sample_details'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$sample_details',
+                    preserveNullAndEmptyArrays: true // Keep particles even if they have no AFE details
+                }
+            },
+            {
+                $addFields: {
+                    sample_date: '$sample_details.sample_date',
+                    sample_nat: '$sample_details.sample_nat',
+                    afe_code: '$sample_details.afe_code',
+                    sample_lat: '$sample_details.sample_lat',
+                    sample_lon: '$sample_details.sample_lon',
+                    temperature_lower_bound: '$sample_details.temperature_lower_bound',
+                    temperature_upper_bound: '$sample_details.temperature_upper_bound',
+                    oxygen_fugacity: '$sample_details.oxygen_fugacity',
+                    experiment_duration: '$sample_details.experiment_duration',
+                    sample_techn: '$sample_details.sample_techn',
+                    sample_surf: '$sample_details.sample_surf',
+                    sample_collector: '$sample_details.sample_collector',
+                    lab_procedure: '$sample_details.lab_procedure',
+                }
+            },
+            {
+                $project: {
+                    sample_details: 0 // Exclude the original 'afe_details' field from the result
                 }
             }
         ]);
 
-        res.status(200).json({ success: true, particles });
+        res.status(200).send(particles);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -203,11 +284,20 @@ const getExamples = async (req, res) => {
  */
 const getTotalParticles = async (req, res) => {
     try {
-        const particleCount = await Particle.countDocuments();
-        
-        res.status(200).json({ totalParticles: particleCount });
+        const particles = await Particle.aggregate([
+            {
+                $match: {
+                    faulty_image: { $ne: true } // Exclude particles with faulty images
+                }
+            },
+            {
+                $count: 'totalParticles'
+            }
+        ]);
+
+        res.status(200).send(particles);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch total particles' });
+        res.status(500).send(error.message);
     }
 };
 
@@ -222,9 +312,9 @@ const add = async (req, res) => {
         
         await newParticle_.save();
         
-        res.status(200).json({ success: true, message: 'Particle added successfully' });
+        res.status(200).send('Particle added successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -238,15 +328,15 @@ const remove = async (req, res) => {
 
     // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ success: false, error: 'No such particle' });
+        return res.status(404).send('No such particle');
     }
 
     try {
         await Particle.findByIdAndDelete(id);
         
-        res.status(200).json({ success: true, message: 'Particle deleted successfully' });
+        res.status(200).send('Particle deleted successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -266,9 +356,9 @@ const update = async (req, res) => {
 
         await Particle.findOneAndUpdate(filter, update, options);
         
-        res.status(200).json({ success: true, message: 'Particle updated successfully' });
+        res.status(200).send('Particle updated successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 

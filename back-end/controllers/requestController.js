@@ -1,5 +1,6 @@
 const { Request } = require('../models/request');
 const { User } = require('../models/user');
+const formidable = require('formidable')
 
 /**
  * Middleware to log incoming requests to the 'Request' collection.
@@ -9,22 +10,79 @@ const { User } = require('../models/user');
  */
 const logRequest = async (req, res, next) => {
     try {
-        const sessionId = req.body.sessionId; // Extract session ID from request body
-        const requestType = req.method; // HTTP method of the request (GET, POST, etc.)
-        const requestUrl = req.url; // URL of the request
+        let sessionId;
+        let requestType = req.method; // HTTP method of the request (GET, POST, etc.)
+        let requestUrl = req.url; // URL of the request
 
-        const requestData = {
-            sessionId,
-            requestType,
-            requestUrl
-        };
-    
-        // Save request data to the 'Request' collection
-        await Request.create(requestData);
+        // Skip parsing for routes that use multer (multer will handle the parsing)
+        const fullUrl = req.originalUrl || req.url;
+        const multerRoutes = ['/preprocessing/upload', '/ood/analyze', '/classify'];
+        if (multerRoutes.some(route => fullUrl.includes(route))) {
+            console.log(`[logRequest] Skipping for multer route: ${fullUrl}`);
+            return next();
+        }
 
-        next(); // Proceed to the next middleware or route handler
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to log request' });
+        // If the request is multipart/form-data
+        if (req.method === 'POST' && req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+            const form = new formidable.IncomingForm();
+            
+            // Adjust file size limit based on route
+            // Preprocessing workflow needs 3 GB for large TIFF files
+            // Other routes (classification) need 1 GB
+            const isPreprocessingRoute = fullUrl.includes('/preprocessing');
+            const maxFileSize = isPreprocessingRoute ? 3 * 1024 * 1024 * 1024 : 1000 * 1024 * 1024;
+            
+            console.log(`[logRequest] Route: ${fullUrl}, isPreprocessing: ${isPreprocessingRoute}, maxFileSize: ${maxFileSize / 1024 / 1024} MB`);
+            
+            form.options.maxTotalFileSize = maxFileSize;
+            form.options.maxFileSize = maxFileSize;
+
+            form.parse(req, async (err, fields, files) => {
+                if (err) {
+                    console.log(err)
+                    return res.status(500).send('Failed to parse form data');
+                }
+
+                // Extract sessionId from the form fields
+                sessionId = fields.sessionId ? fields.sessionId[0] : null;
+
+                // Create request data for logging
+                const requestData = {
+                    sessionId,
+                    requestType,
+                    requestUrl
+                };
+
+                // Save request data to the 'Request' collection
+                await Request.create(requestData);
+
+                req.file = files;
+                req.email = fields.email ? fields.email[0] : null;
+
+                // Ensure next() is called after parsing is complete
+                next();
+            });
+        } else if (req.method === 'POST' && req.headers['content-type'].includes('application/json')) {
+            // For JSON requests, we can access req.body directly
+            sessionId = req.body.sessionId;
+
+            const requestData = {
+                sessionId,
+                requestType,
+                requestUrl
+            };
+
+            // Save request data to the 'Request' collection
+            await Request.create(requestData);
+
+            next();
+
+        } else {
+            next();
+        }
+                
+    } catch {
+        res.status(500).send('Failed to log request');
     }
 };
 
@@ -36,10 +94,9 @@ const logRequest = async (req, res, next) => {
 const getTotalUsers = async (req, res) => {
     try {
         const userCount = await User.countDocuments(); // Count the total number of user documents
-        
-        res.status(200).json({ totalUsers: userCount });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch total users' });
+        res.status(200).send([userCount]);
+    } catch {
+        res.status(500).send('Failed to fetch total users');
     }
 };
 
@@ -60,9 +117,9 @@ const getRequestsPerDay = async (req, res) => {
             { $sort: { _id: 1 } } // Sort by date
         ]);
 
-        res.status(200).json(requestsPerDay);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch requests per day' });
+        res.status(200).send(requestsPerDay);
+    } catch {
+        res.status(500).send('Failed to fetch requests per day');
     }
 };
 
@@ -88,9 +145,9 @@ const getUsersPerDay = async (req, res) => {
             }
         ]);
         
-        res.status(200).json(usersPerDay);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch users per day' });
+        res.status(200).send(usersPerDay);
+    } catch {
+        res.status(500).send('Failed to fetch users per day');
     }
 };
 

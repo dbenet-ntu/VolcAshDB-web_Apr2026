@@ -11,9 +11,95 @@ const get = async (req, res) => {
         // Fetch all Eruption documents
         const eruptions = await Eruption.find();
         
-        res.status(200).json({ success: true, eruptions });
+        res.status(200).send(eruptions);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
+    }
+};
+
+
+/**
+ * Retrieves all Eruption documents from the database.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+const getNearestEruptionsYearsBP = async (req, res) => {
+    try {
+        const { volcID, afeYearsBP } = req.body;
+
+        // Fetch all Eruption documents
+        const eruptions = await Eruption.aggregate([
+            {
+                $match: {
+                    volc_num: volcID,
+                    ed_startyear: {$exists: true}
+                }
+            },
+            {
+                $project : {
+                    volc_num: 1,
+                    ed_num: 1,
+                    ed_code: 1,
+                    ed_startyear: 1,
+                    difference : {
+                        $abs : {
+                            $subtract : ["$ed_startyear", afeYearsBP]
+                        }
+                    }
+                }
+            },
+            {
+                $sort : {difference : 1}
+            }
+        ]);
+
+        res.status(200).send(eruptions);
+    } catch (error) {
+        res.status(404).send(error.message);
+    }
+};
+
+
+/**
+ * Retrieves all Eruption documents from the database.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+const getNearestEruptions = async (req, res) => {
+    try {
+        const { volcID, afeDate } = req.body;
+
+        // Fetch all Eruption documents
+        const eruptions = await Eruption.aggregate([
+            {
+                $match: {
+                    volc_num: volcID,
+                    ed_stime: {$exists: true},
+                    ed_etime: {$exists: true},
+                }
+            },
+            {
+                $project : {
+                    volc_num: 1,
+                    ed_num: 1,
+                    ed_code: 1,
+                    ed_stime: 1,
+                    ed_etime: 1,
+                    difference : {
+                        $abs : {
+                            $subtract : ["$ed_stime", afeDate]
+                        }
+                    }
+                }
+            },
+            {
+                $sort : {difference : 1}
+            }
+        ]);
+
+        res.status(200).send(eruptions);
+    } catch (error) {
+        res.status(404).send(error.message);
     }
 };
 
@@ -26,7 +112,7 @@ const get = async (req, res) => {
 const add = async (req, res) => {
     // Validate that end date is not before start date
     if (req.body.ed_starttime && req.body.ed_endtime && req.body.ed_starttime > req.body.ed_endtime) {
-        return res.status(404).json({ success: false, message: 'End date must be more recent than start date' });
+        return res.status(404).send('End date must be more recent than start date');
     }
 
     try {
@@ -35,7 +121,7 @@ const add = async (req, res) => {
         // Query to find the document to update or create
         const query = {
             volc_num: newEruption.volc_num,
-            ed_code: newEruption.ed_code
+            ed_num: newEruption.ed_num
         };
         // Options for the update operation
         const options = {
@@ -47,9 +133,9 @@ const add = async (req, res) => {
         // Perform the findOneAndUpdate operation
         await Eruption.findOneAndUpdate(query, newEruption, options);
 
-        res.status(200).json({ success: true, message: 'Eruption added successfully' });
+        res.status(200).send('Eruption added successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -64,21 +150,23 @@ const remove = async (req, res) => {
 
     // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ success: false, error: 'No such eruption' });
+        return res.status(404).send('No such eruption');
     }
 
     try {
         // Delete the Eruption document by ID
         await Eruption.findByIdAndDelete(id);
 
-        res.status(200).json({ success: true, message: 'Eruption deleted successfully' });
+        res.status(200).send('Eruption deleted successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
 module.exports = {
     get,
+    getNearestEruptionsYearsBP,
+    getNearestEruptions,
     add,
     remove
 };

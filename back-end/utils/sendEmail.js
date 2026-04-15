@@ -9,7 +9,7 @@ const transporter = require('../config/nodemailer');
  * @param {string} html - The HTML content of the email body.
  * @returns {Promise} - A promise that resolves when the email is sent or rejects if there is an error.
  */
-const sendEmail = async (sender, receiver, subject, html) => {
+const sendEmail = async (sender, receiver, subject, html, attachments = []) => {
     try {
         // Send email with defined transport object
         const info = await transporter.sendMail({
@@ -17,6 +17,7 @@ const sendEmail = async (sender, receiver, subject, html) => {
             to: receiver, // List of receivers
             subject: subject, // Subject line
             html: html, // HTML body
+            attachments
         });
 
         // Log the message ID for reference

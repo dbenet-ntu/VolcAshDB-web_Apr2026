@@ -1,0 +1,1362 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "VolcAshDB RESTful API - Complete Documentation",
+    "description": "Complete RESTful API documentation for all resources with standard HTTP methods and proper resource naming"
+  },
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "volcanoes",
+      "description": "Volcanoes RESTful endpoints - Volcano data and related operations"
+    },
+    {
+      "name": "eruptions",
+      "description": "Eruptions RESTful endpoints - Eruption data and related operations"
+    },
+    {
+      "name": "samples",
+      "description": "Samples RESTful endpoints - Sample data and related operations"
+    },
+    {
+      "name": "particles",
+      "description": "Particles RESTful endpoints - Particle data and related operations"
+    },
+    {
+      "name": "afes",
+      "description": "AFEs RESTful endpoints - AFE (Asf Forming Events) data and related operations"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your bearer token as: Bearer <token>"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/volcanoes/stats": {
+      "get": {
+        "description": "Get statistics about volcanoes collection",
+        "responses": {
+          "200": {
+            "description": "Volcano statistics"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "volcanoes"
+        ],
+        "summary": "Get volcanoes statistics"
+      }
+    },
+    "/volcanoes/{id}": {
+      "get": {
+        "description": "Get a specific volcano by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "description": "The ID of the volcano to retrieve (volc_num)",
+            "example": 210010
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volcano details"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "volcanoes"
+        ],
+        "summary": "Get volcano information"
+      }
+    },
+    "/volcanoes": {
+      "get": {
+        "description": "Get a list of volcanoes with optional filtering by any volcano field",
+        "parameters": [
+          {
+            "name": "volc_num",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by volcano number (exact match)"
+          },
+          {
+            "name": "volc_name",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by volcano name (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_country",
+            "in": "query",
+            "type": "string",
+            "example": "Italy",
+            "description": "Filter by volcano country (exact match)"
+          },
+          {
+            "name": "tectonic_settings",
+            "in": "query",
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "Intraplate / Continental crust (>25 km)",
+              "Intraplate / Intermediate crust (15-25 km)",
+              "Intraplate / Oceanic crust (< 15 km)",
+              "Rift zone / Continental crust (>25 km)",
+              "Rift zone / Intermediate crust (15-25 km)",
+              "Rift zone / Oceanic crust (< 15 km)",
+              "Subduction zone / Continental crust (>25 km)",
+              "Subduction zone / Crustal thickness unknown",
+              "Subduction zone / Intermediate crust (15-25 km)",
+              "Subduction zone / Oceanic crust (< 15 km)"
+            ],
+            "description": "Filter by tectonic setting (exact match)"
+          },
+          {
+            "name": "volc_rtype",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by rock type (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_type",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by volcano type (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_status",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by volcano status (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_loc",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by location details (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_subreg",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by subregion (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_slat",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by latitude (exact match)"
+          },
+          {
+            "name": "volc_slon",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by longitude (exact match)"
+          },
+          {
+            "name": "volc_selev",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by elevation (exact match)"
+          },
+          {
+            "name": "volc_last_eruption",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by volcano last eruption (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_mcont",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by volcanic group region (case-insensitive, partial match)"
+          },
+          {
+            "name": "imgURL",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by image URL (case-insensitive, partial match)"
+          },
+          {
+            "name": "data_source",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by data source (case-insensitive, partial match)"
+          },
+          {
+            "name": "include_stats",
+            "in": "query",
+            "type": "boolean",
+            "description": "Include statistics in the response"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of items to return (1-1000, default: 100)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (default: 1)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of items to skip (alternative to page parameter)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of volcanoes matching the criteria"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "volcanoes"
+        ],
+        "summary": "Get volcanoes"
+      }
+    },
+    "/eruptions/stats": {
+      "get": {
+        "description": "Get statistics about eruptions collection",
+        "responses": {
+          "200": {
+            "description": "Eruption statistics"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "eruptions"
+        ],
+        "summary": "Get eruptions statistics"
+      }
+    },
+    "/eruptions/{id}": {
+      "get": {
+        "description": "Get an eruption by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "number",
+            "description": "The ID of the eruption to retrieve (ed_num)",
+            "example": 22420
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "eruptions"
+        ],
+        "summary": "Get eruption information"
+      }
+    },
+    "/eruptions": {
+      "get": {
+        "description": "Get a list of eruptions with optional filtering by any eruption field",
+        "parameters": [
+          {
+            "name": "ed_num",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by eruption number (exact match)"
+          },
+          {
+            "name": "volc_num",
+            "in": "query",
+            "type": "number",
+            "example": 210010,
+            "description": "Filter eruptions by volcano ID (exact match)"
+          },
+          {
+            "name": "volc_name",
+            "in": "query",
+            "type": "string",
+            "example": "Etna",
+            "description": "Filter by volcano name (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_category",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by eruption category (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_VEI",
+            "in": "query",
+            "type": "number",
+            "example": 3,
+            "description": "Filter by eruption VEI (exact match)"
+          },
+          {
+            "name": "ed_VEI_mod",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by modified VEI (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_area",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by eruption area (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_evidence",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by eruption evidence (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_latitude",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by eruption latitude (exact match)"
+          },
+          {
+            "name": "ed_longitude",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by eruption longitude (exact match)"
+          },
+          {
+            "name": "ed_startday",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by start day (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_startday_mod",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by modified start day (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_startday_unc",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by start day uncertainty (exact match)"
+          },
+          {
+            "name": "ed_startmonth",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by start month (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_startyear",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by start year (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_startyear_mod",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by modified start year (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_startyear_unc",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by start year uncertainty (exact match)"
+          },
+          {
+            "name": "ed_endday",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by end day (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_endday_mod",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by modified end day (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_endday_unc",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by end day uncertainty (exact match)"
+          },
+          {
+            "name": "ed_endmonth",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by end month (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_endyear",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by end year (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_endyear_mod",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by modified end year (case-insensitive, partial match)"
+          },
+          {
+            "name": "ed_endyear_unc",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by end year uncertainty (exact match)"
+          },
+          {
+            "name": "ed_stime",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Filter by start time (ISO date string)"
+          },
+          {
+            "name": "ed_etime",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Filter by end time (ISO date string)"
+          },
+          {
+            "name": "data_source",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by data source (case-insensitive, partial match)"
+          },
+          {
+            "name": "include_stats",
+            "in": "query",
+            "type": "boolean",
+            "description": "Include statistics in the response"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of items to return (1-1000, default: 100)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (default: 1)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of items to skip (alternative to page parameter)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of eruptions matching the criteria"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "eruptions"
+        ],
+        "summary": "Get eruptions"
+      }
+    },
+    "/samples/stats": {
+      "get": {
+        "description": "Get statistics about samples collection",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "samples"
+        ],
+        "summary": "Get samples statistics"
+      }
+    },
+    "/samples/{id}": {
+      "get": {
+        "description": "Get a sample by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the sample to retrieve (sample_code)",
+            "example": "KEL-16-DB2_1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "samples"
+        ],
+        "summary": "Get sample information"
+      }
+    },
+    "/samples": {
+      "get": {
+        "description": "Get a list of samples with optional filtering by any sample field",
+        "parameters": [
+          {
+            "name": "sample_code",
+            "in": "query",
+            "type": "string",
+            "description": "Filter samples by sample code (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_num",
+            "in": "query",
+            "type": "number",
+            "example": 210010,
+            "description": "Filter samples by volcano ID (exact match)"
+          },
+          {
+            "name": "afe_code",
+            "in": "query",
+            "type": "string",
+            "description": "Filter samples by AFE code (case-insensitive, partial match)"
+          },
+          {
+            "name": "sample_date",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Filter by sample date (ISO date string)"
+          },
+          {
+            "name": "sample_lat",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by sample latitude (exact match)"
+          },
+          {
+            "name": "sample_lon",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by sample longitude (exact match)"
+          },
+          {
+            "name": "sample_nat",
+            "in": "query",
+            "type": "boolean",
+            "description": "Filter by whether sample is natural (true) or experimental (false)"
+          },
+          {
+            "name": "sample_techn",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by sample technique (case-insensitive, partial match)"
+          },
+          {
+            "name": "sample_surf",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by sample surface (case-insensitive, partial match)"
+          },
+          {
+            "name": "sample_collector",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by sample collector (case-insensitive, partial match)"
+          },
+          {
+            "name": "lab_procedure",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by laboratory procedure (exact match within array)"
+          },
+          {
+            "name": "temperature_lower_bound",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by temperature lower bound (exact match)"
+          },
+          {
+            "name": "temperature_upper_bound",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by temperature upper bound (exact match)"
+          },
+          {
+            "name": "oxygen_fugacity",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by oxygen fugacity (exact match)"
+          },
+          {
+            "name": "experiment_duration",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by experiment duration (exact match)"
+          },
+          {
+            "name": "include_stats",
+            "in": "query",
+            "type": "boolean",
+            "description": "Include statistics in the response"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of items to return (1-1000, default: 100)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (default: 1)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of items to skip (alternative to page parameter)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "samples"
+        ],
+        "summary": "Get samples"
+      }
+    },
+    "/particles/stats": {
+      "get": {
+        "description": "Get statistics about particles collection",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "particles"
+        ],
+        "summary": "Get particles statistics"
+      }
+    },
+    "/particles/{id}": {
+      "get": {
+        "description": "Get a particle by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the particle to retrieve (imgURL)",
+            "example": "KEL-16-DB2_1_01_4_86_mf_5x_phi1phi2_JJtrlcp.png"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "particles"
+        ],
+        "summary": "Get particle information"
+      }
+    },
+    "/particles": {
+      "get": {
+        "description": "Get a list of particles with optional filtering by any particle field",
+        "parameters": [
+          {
+            "name": "imgURL",
+            "in": "query",
+            "type": "string",
+            "description": "Filter particles by image URL (case-insensitive, partial match)"
+          },
+          {
+            "name": "sample_code",
+            "in": "query",
+            "type": "string",
+            "description": "Filter particles by sample code (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_num",
+            "in": "query",
+            "type": "number",
+            "example": 210010,
+            "description": "Filter particles by volcano ID (exact match)"
+          },
+          {
+            "name": "volc_name",
+            "in": "query",
+            "type": "string",
+            "description": "Filter particles by volcano name (case-insensitive, partial match)"
+          },
+          {
+            "name": "main_type",
+            "in": "query",
+            "type": "string",
+            "enum": [
+              "altered material",
+              "free crystal",
+              "juvenile",
+              "lithic"
+            ],
+            "description": "Filter particles by main type (particles with >0% of this type)"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle ID (exact match)"
+          },
+          {
+            "name": "aspect_rat",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by aspect ratio (exact match)"
+          },
+          {
+            "name": "blue_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean blue channel value (exact match)"
+          },
+          {
+            "name": "blue_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode blue channel value (exact match)"
+          },
+          {
+            "name": "blue_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by blue channel standard deviation (exact match)"
+          },
+          {
+            "name": "circularity_cioni",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by Cioni circularity measure (exact match)"
+          },
+          {
+            "name": "circularity_dellino",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by Dellino circularity measure (exact match)"
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by particle color (exact match)"
+          },
+          {
+            "name": "comp_elon",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by compositional elongation (exact match)"
+          },
+          {
+            "name": "compactness",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle compactness (exact match)"
+          },
+          {
+            "name": "contrast",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by image contrast (exact match)"
+          },
+          {
+            "name": "convexity",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle convexity (exact match)"
+          },
+          {
+            "name": "correlation",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by texture correlation (exact match)"
+          },
+          {
+            "name": "crystallinity",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by crystallinity (exact match)"
+          },
+          {
+            "name": "dissimilarity",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by texture dissimilarity (exact match)"
+          },
+          {
+            "name": "eccentricity_ellipse",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by ellipse-based eccentricity (exact match)"
+          },
+          {
+            "name": "eccentricity_moments",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by moments-based eccentricity (exact match)"
+          },
+          {
+            "name": "edge",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by edge characteristics (exact match)"
+          },
+          {
+            "name": "elongation",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle elongation (exact match)"
+          },
+          {
+            "name": "energy",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by texture energy (exact match)"
+          },
+          {
+            "name": "faulty_image",
+            "in": "query",
+            "type": "boolean",
+            "description": "Filter by whether image is faulty (true/false)"
+          },
+          {
+            "name": "green_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean green channel value (exact match)"
+          },
+          {
+            "name": "green_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode green channel value (exact match)"
+          },
+          {
+            "name": "green_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by green channel standard deviation (exact match)"
+          },
+          {
+            "name": "gsLow",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by lower grain size value (exact match)"
+          },
+          {
+            "name": "gsUp",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by upper grain size value (exact match)"
+          },
+          {
+            "name": "homogeneity",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by texture homogeneity (exact match)"
+          },
+          {
+            "name": "hue_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean hue value (exact match)"
+          },
+          {
+            "name": "hue_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode hue value (exact match)"
+          },
+          {
+            "name": "hue_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by hue standard deviation (exact match)"
+          },
+          {
+            "name": "hydro_alter_degree",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by hydrothermal alteration degree (exact match)"
+          },
+          {
+            "name": "instrument",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by measurement instrument (case-insensitive, partial match)"
+          },
+          {
+            "name": "luster",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by particle luster (exact match)"
+          },
+          {
+            "name": "magnification",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by image magnification level (exact match)"
+          },
+          {
+            "name": "multi_focus",
+            "in": "query",
+            "type": "boolean",
+            "description": "Filter by whether image uses multiple focus levels (true/false)"
+          },
+          {
+            "name": "rect_comp",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by rectangularity complexity (exact match)"
+          },
+          {
+            "name": "rectangularity",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle rectangularity (exact match)"
+          },
+          {
+            "name": "red_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean red channel value (exact match)"
+          },
+          {
+            "name": "red_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode red channel value (exact match)"
+          },
+          {
+            "name": "red_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by red channel standard deviation (exact match)"
+          },
+          {
+            "name": "requiresDetailedAnnotation",
+            "in": "query",
+            "type": "boolean",
+            "description": "Filter by whether particle requires detailed annotation (true/false)"
+          },
+          {
+            "name": "roundness",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle roundness (exact match)"
+          },
+          {
+            "name": "saturation_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean saturation value (exact match)"
+          },
+          {
+            "name": "saturation_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode saturation value (exact match)"
+          },
+          {
+            "name": "saturation_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by saturation standard deviation (exact match)"
+          },
+          {
+            "name": "shape",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by particle shape (exact match)"
+          },
+          {
+            "name": "solidity",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by particle solidity (exact match)"
+          },
+          {
+            "name": "sub_type",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by particle subtype (exact match)"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by particle type (exact match)"
+          },
+          {
+            "name": "ultrasound",
+            "in": "query",
+            "type": "boolean",
+            "description": "Filter by ultrasound usage (true/false)"
+          },
+          {
+            "name": "value_mean",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mean lightness value (exact match)"
+          },
+          {
+            "name": "value_mode",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by mode lightness value (exact match)"
+          },
+          {
+            "name": "value_std",
+            "in": "query",
+            "type": "number",
+            "description": "Filter by lightness standard deviation (exact match)"
+          },
+          {
+            "name": "weathering_sign",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by weathering signs (case-insensitive, partial match)"
+          },
+          {
+            "name": "include_stats",
+            "in": "query",
+            "type": "boolean",
+            "description": "Include statistics in the response"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of items to return (1-1000, default: 100)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (default: 1)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of items to skip (alternative to page parameter)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of particles matching the criteria"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "particles"
+        ],
+        "summary": "Get particles"
+      }
+    },
+    "/afes/stats": {
+      "get": {
+        "description": "Get statistics about afes collection",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "afes"
+        ],
+        "summary": "Get afes statistics"
+      }
+    },
+    "/afes/{id}": {
+      "get": {
+        "description": "Get a afe by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the afe to retrieve (afe_code)",
+            "example": "PIN-3-DB1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "afes"
+        ],
+        "summary": "Get afe information"
+      }
+    },
+    "/afes": {
+      "get": {
+        "description": "Get a list of AFEs (Ash Forming Events) with optional filtering by any AFE field",
+        "parameters": [
+          {
+            "name": "afe_code",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by AFE code (case-insensitive, partial match)"
+          },
+          {
+            "name": "eruptive_style",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by eruptive style (case-insensitive, partial match)"
+          },
+          {
+            "name": "volc_num",
+            "in": "query",
+            "type": "number",
+            "example": 210010,
+            "description": "Filter by volcano number (exact match)"
+          },
+          {
+            "name": "afe_lat",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by AFE latitude (exact match)"
+          },
+          {
+            "name": "afe_lon",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by AFE longitude (exact match)"
+          },
+          {
+            "name": "afe_date",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "Filter by AFE date (ISO date string, exact match)"
+          },
+          {
+            "name": "afe_end_date",
+            "in": "query",
+            "type": "string",
+            "format": "date",
+            "description": "Filter by AFE end date (ISO date string, exact match)"
+          },
+          {
+            "name": "afe_dateBP",
+            "in": "query",
+            "type": "string",
+            "description": "Filter by AFE dateBP (case-insensitive, partial match)"
+          },
+          {
+            "name": "include_stats",
+            "in": "query",
+            "type": "boolean",
+            "description": "Include statistics in the response"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of items to return (1-1000, default: 100)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (default: 1)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of items to skip (alternative to page parameter)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of AFEs matching the criteria"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "afes"
+        ],
+        "summary": "Get AFEs"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "definitions": {}
+}

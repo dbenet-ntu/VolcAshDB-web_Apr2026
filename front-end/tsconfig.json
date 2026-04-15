@@ -1,26 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "target": "esnext",  // Use ESNext for better compatibility with modern JavaScript
+    "lib": ["dom", "dom.iterable", "esnext"],  // Modern libraries
+    "allowJs": true,  // Allows JavaScript files to be included
+    "skipLibCheck": true,  // Skip type checking of declaration files for faster builds
+    "esModuleInterop": true,  // Ensures compatibility with CommonJS modules
+    "allowSyntheticDefaultImports": true,  // Allows default imports from non-ES modules
+    "strict": true,  // Enables strict type checking
+    "forceConsistentCasingInFileNames": true,  // Enforces consistent file name casing
+    "noFallthroughCasesInSwitch": true,  // Prevents fallthrough in switch statements
+    "module": "esnext",  // Use modern ES modules
+    "moduleResolution": "node",  // Node-style module resolution
+    "resolveJsonModule": true,  // Allows importing of JSON files as modules
+    "isolatedModules": true,  // Ensures each file can be transpiled independently (required for Vite)
+    "noEmit": true,  // Don't emit output, Vite handles this
+    "jsx": "react-jsx",  // Use the new JSX transform (React 17+)
+    "types": ["vite/client", "vite-plugin-svgr/client"],
+    "strictNullChecks": true,  // Enable strict null checks
+    "incremental": true,  // Improve incremental builds
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"],  // The source code location
 }

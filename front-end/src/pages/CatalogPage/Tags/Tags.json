@@ -1,66 +1,83 @@
 {
+	"tectonicSetting": {
+		"id": 0,
+		"oriTag": "Tectonic Setting",
+		"choices": [
+			"Intraplate / Continental crust (>25 km)",
+			"Intraplate / Intermediate crust (15-25 km)",
+			"Intraplate / Oceanic crust (< 15 km)",
+			"Rift zone / Continental crust (>25 km)",
+			"Rift zone / Intermediate crust (15-25 km)",
+			"Rift zone / Oceanic crust (< 15 km)",
+			"Subduction zone / Continental crust (>25 km)",
+			"Subduction zone / Crustal thickness unknown",
+			"Subduction zone / Intermediate crust (15-25 km)",
+			"Subduction zone / Oceanic crust (< 15 km)",
+			"Undefined"
+		]
+	},
 	"volcanoName": {
-		"id":1,
+		"id": 1,
 		"oriTag": "Volcano Name",
 		"choices": []
 	},
-	"eruptions": {
-		"id":2,
-		"oriTag": "Eruptions",
+	"ashFormingEvents": {
+		"id": 2,
+		"oriTag": "Ash Forming Events",
 		"choices": []
 	},
 	"eruptiveStyle" : {
 		"id": 3,
 		"oriTag": "Eruptive Style",
-		"choices":["subplinian", "phreatic", "dome explosion", "lava fountaining", "plinian", "strombolian"]
+		"choices": ["Subplinian", "Phreatic", "Dome explosion", "Lava fountaining", "Plinian", "Strombolian"]
 	},
 	"grainSize" : {
-		"id" : 4,
+		"id": 4,
 		"oriTag": "Grain Size",
-		"choices": ["phi0-phi1", "phi1-phi2", "phi2-phi3", "mesh60", "mesh120", "morephi0"]
+		"choices": ["phi0phi1", "phi1phi2", "unsieved", "mesh60", "mesh120", "morephi0"]
 	},
 	"mainType": {
 		"id": 5,
 		"oriTag": "Main Type",
-		"choices":["free crystal","altered material","juvenile","lithic"]
+		"choices": ["free crystal","altered material","juvenile","lithic"]
 	},
 	"shape" :{
 		"id": 6,
 		"oriTag": "Shape",
-		"choices":["blocky", "fluidal", "microtubular","highly vesicular","spongy","pumice","aggregate"]
+		"choices": ["blocky", "fluidal", "microtubular","highly vesicular","spongy","pumice","aggregate"]
 	},
 	"crystallinity" :{
 		"id": 7,
 		"oriTag": "Crystallinity",
-		"choices":["low crystallinity", "mid crystallinity", "high crystallinity"]
+		"choices": ["low crystallinity", "mid crystallinity", "high crystallinity"]
 	},
 	"color" :{
-		"id":8,
+		"id": 8,
 		"oriTag": "Color",
-		"choices":["black","transparent"]
+		"choices": ["black","transparent"]
 	},
 	"hydroAlterDegree" :{
-		"id":9,
+		"id": 9,
 		"oriTag": "Hydrothermal Alteration Degree",
-		"choices":["none", "low", "medium","high"]
+		"choices": ["none", "low", "medium","high"]
 	},
 	"juvenileType" :{
-		"id":10,
+		"id": 10,
 		"oriTag": "Juvenile Type",
-		"choices":["standard juvenile","coated juvenile particles"]
+		"choices": ["standard juvenile","coated juvenile particles"]
 	},
 	"lithicType" :{
-		"id":11,
+		"id": 11,
 		"oriTag": "Lithic Type",
-		"choices":["standard lithic","recycled juvenile particles"]
+		"choices": ["standard lithic","recycled juvenile particles"]
 	},
 	"alteredMaterialType" :{
-		"id":12,
+		"id": 12,
 		"oriTag": "Altered Material Type",
-		"choices":["weathered material", "hydrothermally altered material"]
+		"choices": ["weathered material", "hydrothermally altered material"]
 	},
 	"freeCrystalType" :{
-		"id" : 13,
+		"id": 13,
 		"oriTag": "Free Crystal Type",
 		"choices": ["plagioclase","pyroxene", "amphibole","S-group mineral","olivine","others"]
 	}

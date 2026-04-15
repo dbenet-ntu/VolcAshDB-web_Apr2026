@@ -9,135 +9,179 @@ const { Particle } = require('../models/particle');
  */
 const get = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const { userId, displayNaturalData } = req.body;
 
-        // Find all opinions for the given userId
-        const opinions = await Opinion.find({ userId: userId });
+        const display_natural = displayNaturalData === true;
 
-        if (opinions.length > 0) {
-            // Extract particle IDs from the opinions
-            const particleIds = opinions.map(opinion => opinion.particleId);
+        if (mongoose.Types.ObjectId.isValid(userId)) {
 
-            // Aggregate particle details based on the particle IDs
-            const particles = await Particle.aggregate([
-                { $match: { _id: { $in: particleIds } } },
-                {
-                    $lookup: {
-                        from: "opinions",
-                        localField: "_id",
-                        foreignField: "particleId",
-                        as: "opinions"
-                    }
-                },
-                {
-                    $project: {
-                        main_type: {
-                            $cond: {
-                                if: { $isArray: "$opinions" },
-                                then: {
-                                    $cond: {
-                                        if: { $eq: [{ $size: "$opinions" }, 0] },
-                                        then: "$main_type",
-                                        else: { $arrayElemAt: ["$opinions.main_type", 0] }
-                                    }
-                                },
-                                else: "$main_type"
-                            }
-                        },
-                        afe_code: 1,
-                        asm: 1, 
-                        aspect_rat: 1, 
-                        blue_mean: 1, 
-                        blue_std: 1, 
-                        blue_mode: 1, 
-                        circ_elon: 1,
-                        circ_rect: 1, 
-                        circularity_cioni: 1,
-                        circularity_dellino: 1,
-                        color: 1,
-                        comp_elon: 1, 
-                        compactness: 1, 
-                        contrast: 1, 
-                        convexity: 1, 
-                        correlation: 1, 
-                        crystallinity: 1,
-                        dissimilarity: 1, 
-                        eccentricity_ellipse: 1,
-                        eccentricity_moments: 1, 
-                        elongation: 1, 
-                        energy: 1, 
-                        faulty_image: 1,
-                        green_mean: 1, 
-                        green_mode: 1, 
-                        green_std: 1, 
-                        gsLow: 1,
-                        gsUp: 1,
-                        homogeneity: 1, 
-                        hue_mean: 1,
-                        hue_mode: 1,
-                        hue_std: 1,
-                        hydro_alter_degree: 1, 
-                        id: 1, 
-                        imgURL: 1,
-                        instrument: 1,
-                        luster: 1,
-                        magnification: 1,
-                        multi_focus: 1,
-                        rect_comp: 1, 
-                        rectangularity: 1, 
-                        red_mean: 1, 
-                        red_mode: 1,
-                        red_std: 1, 
-                        requiresDetailedAnnotation: 1,
-                        roundness: 1, 
-                        saturation_mean: 1,
-                        saturation_mode: 1,
-                        saturation_std: 1,
-                        shape: 1,
-                        solidity: 1, 
-                        sub_type: 1,
-                        type: 1,
-                        value_mean: 1,
-                        value_mode: 1,
-                        value_std: 1,
-                        volc_name: 1,
-                        volc_num: 1, 
-                        weathering_sign: 1
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'afes',
-                        localField: 'afe_code',
-                        foreignField: 'afe_code',
-                        as: 'afe_details'
-                    }
-                },
-                {
-                    $unwind: {
-                        path: '$afe_details',
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
-                {
-                    $addFields: {
-                        eruptive_style: '$afe_details.eruptive_style',
-                        temperature_lower_bound: '$afe_details.temperature_lower_bound',
-                        temperature_upper_bound: '$afe_details.temperature_upper_bound',
-                        oxygen_fugacity: '$afe_details.oxygen_fugacity',
-                        experiment_duration: '$afe_details.experiment_duration'
-                    }
-                },
-                {
-                    $project: {
-                        afe_details: 0 // Exclude the afe_details field from the final result
-                    }
-                }
-            ]);
+            // Find all opinions for the given userId
+            const opinions = await Opinion.find({ userId: userId });
 
-            res.status(200).json({ success: true, opinions, particles });
+            if (opinions.length > 0) {
+                // Extract particle IDs from the opinions
+                const particleIds = opinions.map(opinion => opinion.particleId);
+
+                // Aggregate particle details based on the particle IDs
+                const particles = await Particle.aggregate([
+                    { $match: { _id: { $in: particleIds } } },
+                    {
+                        $lookup: {
+                            from: "opinions",
+                            localField: "_id",
+                            foreignField: "particleId",
+                            as: "opinions"
+                        }
+                    },
+                    {
+                        $project: {
+                            main_type: {
+                                $cond: {
+                                    if: { $isArray: "$opinions" },
+                                    then: {
+                                        $cond: {
+                                            if: { $eq: [{ $size: "$opinions" }, 0] },
+                                            then: "$main_type",
+                                            else: { $arrayElemAt: ["$opinions.main_type", 0] }
+                                        }
+                                    },
+                                    else: "$main_type"
+                                }
+                            },
+                            asm: 1, 
+                            aspect_rat: 1, 
+                            blue_mean: 1, 
+                            blue_std: 1, 
+                            blue_mode: 1, 
+                            circ_elon: 1,
+                            circ_rect: 1, 
+                            circularity_cioni: 1,
+                            circularity_dellino: 1,
+                            color: 1,
+                            comp_elon: 1, 
+                            compactness: 1, 
+                            contrast: 1, 
+                            convexity: 1, 
+                            correlation: 1, 
+                            crystallinity: 1,
+                            dissimilarity: 1, 
+                            eccentricity_ellipse: 1,
+                            eccentricity_moments: 1, 
+                            elongation: 1, 
+                            energy: 1, 
+                            faulty_image: 1,
+                            green_mean: 1, 
+                            green_mode: 1, 
+                            green_std: 1, 
+                            gsLow: 1,
+                            gsUp: 1,
+                            homogeneity: 1, 
+                            hue_mean: 1,
+                            hue_mode: 1,
+                            hue_std: 1,
+                            hydro_alter_degree: 1, 
+                            id: 1, 
+                            imgURL: 1,
+                            instrument: 1,
+                            luster: 1,
+                            magnification: 1,
+                            multi_focus: 1,
+                            rect_comp: 1, 
+                            rectangularity: 1, 
+                            red_mean: 1, 
+                            red_mode: 1,
+                            red_std: 1, 
+                            requiresDetailedAnnotation: 1,
+                            roundness: 1, 
+                            sample_code: 1,
+                            saturation_mean: 1,
+                            saturation_mode: 1,
+                            saturation_std: 1,
+                            shape: 1,
+                            solidity: 1, 
+                            sub_type: 1,
+                            type: 1,
+                            value_mean: 1,
+                            value_mode: 1,
+                            value_std: 1,
+                            volc_name: 1,
+                            volc_num: 1, 
+                            weathering_sign: 1
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'samples',
+                            localField: 'sample_code',
+                            foreignField: 'sample_code',
+                            as: 'sample_details'
+                        }
+                    },
+                    {
+                        $unwind: {
+                            path: '$sample_details',
+                            preserveNullAndEmptyArrays: true
+                        }
+                    },
+                    {
+                        $addFields: {
+                            sample_date: '$sample_details.sample_date',
+                            sample_nat: '$sample_details.sample_nat',
+                            afe_code: '$sample_details.afe_code',
+                            sample_lat: '$sample_details.sample_lat',
+                            sample_lon: '$sample_details.sample_lon',
+                            temperature_lower_bound: '$sample_details.temperature_lower_bound',
+                            temperature_upper_bound: '$sample_details.temperature_upper_bound',
+                            oxygen_fugacity: '$sample_details.oxygen_fugacity',
+                            experiment_duration: '$sample_details.experiment_duration',
+                            sample_techn: '$sample_details.sample_techn',
+                            sample_surf: '$sample_details.sample_surf',
+                            sample_collector: '$sample_details.sample_collector',
+                            lab_procedure: '$sample_details.lab_procedure',
+                        }
+                    },
+                    {
+                        $project: {
+                            afe_details: 0 // Exclude the afe_details field from the final result
+                        }
+                    },
+                    {
+                        $match: {
+                            sample_nat: display_natural
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'afes',
+                            localField: 'afe_code',
+                            foreignField: 'afe_code',
+                            as: 'afe_details'
+                        }
+                    },
+                    {
+                        $unwind: {
+                            path: '$afe_details',
+                            preserveNullAndEmptyArrays: true
+                        }
+                    },
+                    {
+                        $addFields: {
+                            eruptive_style: '$afe_details.eruptive_style'
+                        }
+                    },
+                    {
+                        $project: {
+                            afe_details: 0 // Exclude the afe_details field from the final result
+                        }
+                    }
+                ]);
+
+                res.status(200).json({ success: true, opinions, particles });
+            } else {
+                res.status(200).json({ success: false, opinions });
+            }
         } else {
-            res.status(200).json({ success: false, opinions });
+            res.status(200).json({ success: false, error: "User connected by SSO don't have opinions" });
         }
     } catch (error) {
         res.status(404).json({ success: false, error: error.message });

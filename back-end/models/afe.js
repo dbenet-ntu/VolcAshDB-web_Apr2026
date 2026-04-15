@@ -12,11 +12,13 @@ const afeSchema = new Schema({
         type: String    // afe_code is of type String
     },
     afe_date: {
-        required: true, // afe_date is a required field
         type: Date      // afe_date is of type Date
     },
     afe_end_date: {
         type: Date      // afe_end_date is of type Date
+    },
+    afe_dateBP: {
+        type: String    // afe_dateBP is of type String
     },
     eruptive_style: {
         required: true, // eruptive_style is a required field
@@ -33,19 +35,6 @@ const afeSchema = new Schema({
     afe_lon: {
         required: true, // afe_lon (longitude) is a required field
         type: String    // afe_lon (longitude) is of type String
-    },
-    temperature_lower_bound: {
-        type: Number    // temperature_lower_bound is of type Number
-    },
-    temperature_upper_bound: {
-        type: Number    // temperature_upper_bound is of type Number
-    },
-    oxygen_fugacity: {
-        enum: oxygen_fugacity,  // oxygen_fugacity must be either 'low' or 'high'
-        type: String            // oxygen_fugacity is of type String
-    },
-    experiment_duration: {
-        type: Number    // experiment_duration is of type Number
     }
 }, {
     collection: 'afes', // Collection name in MongoDB

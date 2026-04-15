@@ -14,7 +14,8 @@ const subtypes = {
     STANDARD_JUVENILE: "standard juvenile",                                 // Standard juvenile type
     WEATHERED_MATERIAL: "weathered material",                               // Weathered material type
     HYDROTHERMALLY_ALTERED_MATRIAL: "hydrothermally altered material",      // Hydrothermally altered material type
-    STANDARD_LITHIC: "standard lithic"                                      // Standard lithic type
+    STANDARD_LITHIC: "standard lithic",                                     // Standard lithic type
+    EMPTY: ""
 };
 
 // Export the subtypes constants for use in other modules

@@ -1,91 +1,46 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const tectonic_settings = require("../enums/tectonic_settings")
 
 /**
- * Volcano Schema: Defines the structure of the 'volcanos' collection in MongoDB.
+ * Volcano Schema: Defines the structure of the 'volcanoes' collection in MongoDB.
  * This schema tracks details of each volcano in the system, following Smithsonian database schema:
- * https://doi.org/10.5479/si.GVP.VOTW5-2024.5.2
+ * https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3
  */
 const volcanoSchema = new Schema({
+    createdAt: {
+        type: Date      // Date when the volcano data was imported from GVP
+    },
+    data_source: {
+        type: String    // Source of the volcano data information 'GVP'
+    },
     imgURL: {
-        type: String    // Filename of the particle image of the volcano is of type String
-    },
-    mj_rock1: {
-        type: String    // Major rock type 1 is of type String
-    },
-    mj_rock2: {
-        type: String    // Major rock type 2 is of type String
-    },
-    mj_rock3: {
-        type: String    // Major rock type 3 is of type String
-    },
-    mj_rock4: {
-        type: String    // Major rock type 4 is of type String
-    },
-    mj_rock5: {
-        type: String    // Major rock type 5 is of type String
-    },
-    mn_rock1: {
-        type: String    // Minor rock type 1 is of type String
-    },
-    mn_rock2: {
-        type: String    // Minor rock type 2 is of type String
-    },
-    mn_rock3: {
-        type: String    // Minor rock type 3 is of type String
-    },
-    mn_rock4: {
-        type: String    // Minor rock type 4 is of type String
-    },
-    mn_rock5: {
-        type: String    // Minor rock type 5 is of type String
+        type: String    // URL of the volcano image
     },
     tectonic_settings: {
-        type: String    // Tectonic settings related to the volcano is of type String
-    },   
-    volc_cavw: {
-        type: String    // volc_cavw is of type String
-    },
-    volc_code: {
-        type: String    // Unique code identifying the volcano is of type String
-    },
-    volc_com: {
-        type: String    // Additional comments or notes about the volcano is of type String
+        enum: tectonic_settings,                // Tectonic settings must be a contains in tectonic_settings enum
+        type: String,                           // Tectonic settings related to the volcano is of type String
+        default: tectonic_settings.UNDEFINED    // Default value is UNDEFINED
     },
     volc_country: {
         type: String    // Country where the volcano is located is of type String
     },
-    volc_desc: {
-        type: String    // Description of the volcano is of type String
-    },
-    volc_evol: {
-        type: String    // Evolution of the volcano over time is of type String
-    },
-    volc_inf_com: {
-        type: String    // Information comments about the volcano is of type String
-    },
-    volc_lcald_dia: {
-        type: String    // Diameter of the caldera is of type String
+    volc_last_eruption: {
+        type: String    // Last known eruption date or period is of type String
     },
     volc_loc: {
         type: String    // Location details of the volcano is of type String
     },
-    volc_mcount: {
-        type: String    // volc_mcount is of type String
+    volc_mcont: {
+        type: String    // volc_mcont is of type String
     },
     volc_name: {
         required: true, // Name of the volcano, which is a mandatory field 
         type: String    // Volcano name is of type String
     },
-    volc_name2: {
-        type: String    // Alternative name of the volcano is of type String
-    },
     volc_num: {
         required: true, // Volcano number, which is a mandatory field
         type: Number    // Number or identifier for the volcano is of type Number
-    },
-    volc_numcald: {
-        type: String    // volc_numcald is of type String
     },
     volc_rtype: {
         type: String    // Rock type or volcanic rock type is of type String
@@ -94,9 +49,11 @@ const volcanoSchema = new Schema({
         type: String    // Elevation of the volcano is of type String
     },
     volc_slat: {
+        required: true, // Latitude of the volcano, which is a mandatory field
         type: String    // Latitude of the volcano is of type String
     },
     volc_slon: {
+        required: true, // Longitude of the volcano, which is a mandatory field
         type: String    // Longitude of the volcano is of type String
     },
     volc_status: {
@@ -107,18 +64,9 @@ const volcanoSchema = new Schema({
     },
     volc_type: {
         type: String    // Type of volcano is of type String
-    },
-    volc_tzone: {
-        type: String    // Time zone of the volcano's location is of type String
-    },
-    volc_ycald_lat: {
-        type: String    // Latitude of the caldera's location is of type String
-    },
-    volc_ycald_lon: {
-        type: String    // Longitude of the caldera's location is of type String
     }
 }, {
-    collection: 'volcanos', // Collection name in MongoDB
+    collection: 'volcanoes', // Collection name in MongoDB
     timestamps: true // Automatically add createdAt and updatedAt fields
 });
 

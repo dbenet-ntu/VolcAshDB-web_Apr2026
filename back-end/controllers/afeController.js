@@ -11,9 +11,9 @@ const get = async (req, res) => {
         // Fetch all AFE documents
         const afes = await AFE.find();
         
-        res.status(200).json({ success: true, afes });
+        res.status(200).send(afes);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -29,7 +29,7 @@ const add = async (req, res) => {
         // Query to find the document to update or create
         const query = {
             volc_num: newAFE.volc_num,
-            ed_code: newAFE.ed_code
+            ed_num: newAFE.ed_num
         };
         // Options for the update operation
         const options = {
@@ -41,9 +41,9 @@ const add = async (req, res) => {
         // Perform the findOneAndUpdate operation
         await AFE.findOneAndUpdate(query, newAFE, options);
 
-        res.status(200).json({ success: true, message: 'AFE added successfully' });
+        res.status(200).send('AFE added successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -58,16 +58,16 @@ const remove = async (req, res) => {
 
     // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ success: false, error: 'No such AFE' });
+        return res.status(404).send('No such AFE');
     }
 
     try {
         // Delete the AFE document by ID
         await AFE.findByIdAndDelete(id);
         
-        res.status(200).json({ success: true, message: 'AFE deleted successfully' });
+        res.status(200).send('AFE deleted successfully');
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 
@@ -85,22 +85,22 @@ const getVolcano = async (req, res) => {
         const afes = await AFE.aggregate([
             {
                 $lookup: {
-                    from: "volcanos", // Collection to join with
+                    from: "volcanoes", // Collection to join with
                     localField: "volc_num", // Field from AFE
                     foreignField: "volc_num", // Field from volcanos
-                    as: "volcano" // Output array field
+                    as: "volcano_details" // Output array field
                 }
             },
             {
                 $match: {
-                    "volcano.volc_name": volc_name // Filter based on the volcano name
+                    "volcano_details.volc_name": volc_name // Filter based on the volcano name
                 }
             }
         ]);
         
-        res.status(200).json({ success: true, afes });
+        res.status(200).send(afes);
     } catch (error) {
-        res.status(404).json({ success: false, error: error.message });
+        res.status(404).send(error.message);
     }
 };
 

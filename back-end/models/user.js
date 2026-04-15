@@ -168,8 +168,6 @@ userSchema.statics.verifyCode = async function(email, code) {
     user.verificationCode = null;
 
     await user.save();
-
-    return user;
 };
 
 

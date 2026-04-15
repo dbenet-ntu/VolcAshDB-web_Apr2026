@@ -17,7 +17,7 @@ const requireAdminRole = (req, res, next) => {
 
     // If no token is provided, respond with a 401 Unauthorized status
     if (!token) {
-        return res.status(401).json({ error: 'Access denied. No token provided.' });
+        return res.status(401).send('Access denied. No token provided.');
     }
 
     try {
@@ -30,11 +30,11 @@ const requireAdminRole = (req, res, next) => {
             next(); // User is an admin, proceed to the next middleware
         } else {
             // Respond with a 403 Forbidden status if the user is not an admin
-            res.status(403).json({ error: 'Access denied. Admins only.' });
+            res.status(403).send('Access denied. Admins only.');
         }
-    } catch (ex) {
+    } catch {
         // Respond with a 400 Bad Request status if the token is invalid
-        res.status(400).json({ error: 'Invalid token.' });
+        res.status(400).send('Invalid token.');
     }
 };
 

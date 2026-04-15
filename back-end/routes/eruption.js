@@ -3,6 +3,8 @@ const requireAuth = require('../middlewares/requireAuth');
 
 const {
     get,
+    getNearestEruptionsYearsBP,
+    getNearestEruptions,
     add,
     remove
 } = require('../controllers/eruptionController');
@@ -15,6 +17,21 @@ const {
  * @access Public
  */
 router.post('/get', get);
+
+/**
+ * @route POST /get
+ * @description Fetches eruption data (specific details should be defined in the controller)
+ * @access Public
+ */
+router.post('/getNearestEruptionsYearsBP', getNearestEruptionsYearsBP);
+
+
+/**
+ * @route POST /get
+ * @description Fetches eruption data (specific details should be defined in the controller)
+ * @access Public
+ */
+router.post('/getNearestEruptions', getNearestEruptions);
 
 // Apply authentication middleware to all subsequent routes
 router.use(requireAuth);

@@ -45,6 +45,7 @@ particles/
 scripts/
 public/
 build/
+uploads/
 
 # Dependency files
 *.txt

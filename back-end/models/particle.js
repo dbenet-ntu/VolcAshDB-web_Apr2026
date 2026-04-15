@@ -17,9 +17,9 @@ const gsLow = require("../enums/gsLow")
  * This schema contains various properties representing physical, chemical, and visual characteristics of particles.
  */
 const particleSchema = new Schema({
-    afe_code: {			    
-        required: true,             // afe_code is a required field
-        type: String                // String type for the AFE code
+    asm: {
+        required: true,             // asm is a required field
+        type: Number                // asm is of type Number
     },
     aspect_rat: {
         required: true,             // aspect_rat is a required field
@@ -44,6 +44,14 @@ const particleSchema = new Schema({
     circularity_dellino: {
         required: true,             // circularity_dellino is a required field
         type: Number                // Circularity measure by Dellino's method is of type Number
+    },
+    circ_elon: {
+        required: true,             // circ_elon is a required field
+        type: Number                // Circularity measure by circ_dellino * elongation is of type Number
+    },
+    circ_rect: {
+        required: true,             // circ_rect is a required field
+        type: Number                // Circularity measure by circ_dellino * rectangularity method is of type Number
     },
     color: {
         enum: colors,               // Possible values for color, imported from an enum
@@ -188,6 +196,9 @@ const particleSchema = new Schema({
     multi_focus: {			
         type: Boolean               // Whether the image uses multiple focus levels
     },
+    publication: {
+        type: Array                 // Array of publications related to the particle classification
+    },
     rect_comp: {
         required: true,             // rect_comp is a required field
         type: Number                // Rectangularity complexity measure is of type Number
@@ -214,6 +225,10 @@ const particleSchema = new Schema({
     roundness: {
         required: true,             // roundness is a required field
         type: Number                // Measure of particle roundness is of type Number
+    },
+    sample_code: {			    
+        required: true,             // sample_code is a required field
+        type: String                // String type for the Sample code
     },
     saturation_mean: {
         required: true,             // saturation_mean is a required field
@@ -243,6 +258,9 @@ const particleSchema = new Schema({
         enum: types,                // Enum for particle type (e.g., natural, experimental)
         type: String                // Type is of type String
     },
+    ultrasound: {
+        type: Boolean               // Ultrasound is of type Boolean
+    },
     value_mean: {
         required: true,             // value_mean is a required field
         type: Number                // Mean value for lightness (Value) in HSL color model is of type Number
@@ -264,7 +282,7 @@ const particleSchema = new Schema({
         type: Number                // Number type for the volcano ID is of type Number
     },
     weathering_sign: {
-        type: Boolean               // Indicates if there are signs of weathering
+        type: String                // Indicates if there are signs of weathering
     }
 }, {
 	collection: 'particles',        // Name of the collection in MongoDB

@@ -3,6 +3,7 @@ const requireAuth = require('../middlewares/requireAuth');
 
 const {
     get, 
+    getTectonicSetting,
     getVolcStd,
     getVolcNum,
     add,
@@ -13,11 +14,18 @@ const {
 // Public Volcano routes
 
 /**
- * @route GET /get
+ * @route POST /get
  * @description Fetches volcano data (specific details should be defined in the controller)
  * @access Public
  */
-router.get('/get', get);
+router.post('/get', get);
+
+/**
+ * @route POST /getTectonicSetting
+ * @description Fetches volcano corresponding to a specific Tectonic Setting
+ * @access Public
+ */
+router.post("/getTectonicSetting", getTectonicSetting);
 
 /**
  * @route POST /getVolcStd

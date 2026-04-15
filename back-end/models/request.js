@@ -9,7 +9,8 @@ const Schema = mongoose.Schema
 const requestSchema = new Schema({
     sessionId: {
         type: String,           // Session ID to identify the session where the request originated
-        required: true          // sessionId is a required field
+        required: false,
+        default: 'anonymous'
     },
     requestType: {
         type: String,           // Type of request (e.g., GET, POST, etc.)
