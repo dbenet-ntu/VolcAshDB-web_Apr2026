@@ -91,7 +91,7 @@ module.exports = {
     {
       name: 'volcashdb-classifier',
       cwd: './volcashclassifier',  // Use submodule within volcashdev
-      script: '/root/.local/bin/uv',
+      script: 'uv',
       args: 'run -m app.main',
       interpreter: 'none',  // Don't use Node.js interpreter
       instances: 1,

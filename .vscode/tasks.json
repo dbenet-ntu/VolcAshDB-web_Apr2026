@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run frontend dev server",
+			"type": "shell",
+			"command": "cd front-end && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run frontend dev server with nvm",
+			"type": "shell",
+			"command": "source \"$HOME/.nvm/nvm.sh\" && nvm use 20.14.0 >/dev/null && cd front-end && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Install frontend dependencies with nvm",
+			"type": "shell",
+			"command": "source \"$HOME/.nvm/nvm.sh\" && nvm use 20.14.0 >/dev/null && cd front-end && npm install",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
