@@ -1,0 +1,3 @@
+[submodule "volcashclassifier"]
+	path = volcashclassifier
+	url = https://github.com/kmigadel-ipgp/volcashclassifier.git
